@@ -26,7 +26,6 @@ class Configuration {
     vector<vector<float>> getBlocks();
 
    private:
-    // the container
     float time;
     vector<float> start;
     vector<float> goal;
