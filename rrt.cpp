@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 
+#include "Configuration.h"
+
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
@@ -92,17 +94,17 @@ void RRT_Planner::plan() {
     goal[1] = goal_coord[1];
     goal[2] = goal_coord[2];
 
-    // define space information for this state space
+    // // define space information for this state space
     auto si(std::make_shared<ob::SpaceInformation>(space));
     si->setStateValidityChecker(std::bind(&RRT_Planner::isStateValid, this, std::placeholders::_1));
     si->setStateValidityCheckingResolution(0.01);
     si->setup();
 
-    // create a problem instance
+    // // create a problem instance
     auto pdef(std::make_shared<ob::ProblemDefinition>(si));
     pdef->setStartAndGoalStates(start, goal);
 
-    // define a RRT planner
+    // // define a RRT planner
     auto planner(std::make_shared<og::RRT>(si));
     planner->setProblemDefinition(pdef);  // set the problem we are trying to solve for the planner
     planner->setup();
@@ -122,11 +124,19 @@ void RRT_Planner::plan() {
 }
 
 int main(int argc, const char *argv[]) {
-    float time = 5.0;
-    std::vector<float> start_coord{2.3, 2.3, 1.3};
-    std::vector<float> goal_coord{7.0, 7.0, 5.5};
-    std::vector<float> boundary{-5, -5, -5, 10, 10, 10};
-    std::vector<std::vector<float>> blocks{{4.5, 4.5, 2.5, 5.5, 5.5, 3.5}};
+    if (argc < 2) {
+        std::cout << "Please specify configuration file..." << std::endl;
+        exit(0);
+    }
+
+    Configuration config;
+    config.Load(argv[1]);
+
+    float time = config.getTime();
+    std::vector<float> start_coord = config.getStart();
+    std::vector<float> goal_coord = config.getGoal();
+    std::vector<float> boundary = config.getBoundary();
+    std::vector<std::vector<float>> blocks = config.getBlocks();
 
     RRT_Planner rrt(time, start_coord, goal_coord, boundary, blocks);
     rrt.plan();
