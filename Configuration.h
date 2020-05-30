@@ -18,7 +18,7 @@ class Configuration {
     // remove leading and trailing tabs and spaces
     string Trim(const string& str);
 
-    // get data
+    // get value associated with given key
     float getTime();
     vector<float> getStart();
     vector<float> getGoal();
@@ -26,6 +26,7 @@ class Configuration {
     vector<vector<float>> getBlocks();
 
    private:
+    // the container
     float time;
     vector<float> start;
     vector<float> goal;

@@ -1,45 +1,19 @@
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <ompl/base/spaces/SE3StateSpace.h>
-#include <ompl/config.h>
-#include <ompl/geometric/SimpleSetup.h>
-#include <ompl/geometric/planners/rrt/RRT.h>
+#include "Planner.h"
 
 #include <iostream>
 #include <vector>
 
 #include "Configuration.h"
 
-namespace ob = ompl::base;
-namespace og = ompl::geometric;
-
-class RRT_Planner {
-   private:
-    float time;
-    std::vector<float> start_coord;
-    std::vector<float> goal_coord;
-    std::vector<float> boundary;
-    std::vector<std::vector<float>> blocks;
-
-   public:
-    RRT_Planner(float time, std::vector<float> start_coord, std::vector<float> goal_coord,
-                std::vector<float> boundary, std::vector<std::vector<float>> blocks);
-
-    // state validity checking function
-    bool isStateValid(const ob::State *state);
-
-    // planner
-    void plan();
-};
-
-RRT_Planner::RRT_Planner(float time, std::vector<float> start_coord, std::vector<float> goal_coord,
-                         std::vector<float> boundary, std::vector<std::vector<float>> blocks)
+Planner::Planner(float time, std::vector<float> start_coord, std::vector<float> goal_coord,
+                 std::vector<float> boundary, std::vector<std::vector<float>> blocks)
     : time(time),
       start_coord(start_coord),
       goal_coord(goal_coord),
       boundary(boundary),
       blocks(blocks) {}
 
-bool RRT_Planner::isStateValid(const ob::State *state) {
+bool Planner::isStateValid(const ob::State *state) {
     // cast the abstract state type to the type we expect
     const auto *pos = state->as<ob::RealVectorStateSpace::StateType>();
 
@@ -64,7 +38,7 @@ bool RRT_Planner::isStateValid(const ob::State *state) {
     return true;
 }
 
-void RRT_Planner::plan() {
+void Planner::plan() {
     // construct a state space we are planning in
     auto space(std::make_shared<ob::RealVectorStateSpace>(3));
 
@@ -96,15 +70,15 @@ void RRT_Planner::plan() {
 
     // // define space information for this state space
     auto si(std::make_shared<ob::SpaceInformation>(space));
-    si->setStateValidityChecker(std::bind(&RRT_Planner::isStateValid, this, std::placeholders::_1));
+    si->setStateValidityChecker(std::bind(&Planner::isStateValid, this, std::placeholders::_1));
     si->setStateValidityCheckingResolution(0.01);
     si->setup();
 
-    // // create a problem instance
+    // create a problem instance
     auto pdef(std::make_shared<ob::ProblemDefinition>(si));
     pdef->setStartAndGoalStates(start, goal);
 
-    // // define a RRT planner
+    // define a RRT planner
     auto planner(std::make_shared<og::RRT>(si));
     planner->setProblemDefinition(pdef);  // set the problem we are trying to solve for the planner
     planner->setup();
@@ -121,25 +95,4 @@ void RRT_Planner::plan() {
     } else {
         std::cout << "No solution found" << std::endl;
     }
-}
-
-int main(int argc, const char *argv[]) {
-    if (argc < 2) {
-        std::cout << "Please specify configuration file..." << std::endl;
-        exit(0);
-    }
-
-    Configuration config;
-    config.Load(argv[1]);
-
-    float time = config.getTime();
-    std::vector<float> start_coord = config.getStart();
-    std::vector<float> goal_coord = config.getGoal();
-    std::vector<float> boundary = config.getBoundary();
-    std::vector<std::vector<float>> blocks = config.getBlocks();
-
-    RRT_Planner rrt(time, start_coord, goal_coord, boundary, blocks);
-    rrt.plan();
-
-    return 0;
 }
