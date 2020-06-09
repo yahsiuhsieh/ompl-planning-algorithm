@@ -10,7 +10,7 @@ import time
 import matplotlib.pyplot as plt; plt.ion()
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import Weighted_Astar_Planner as Astar
+#import Weighted_Astar_Planner as Astar
 import Dstar_Planner as Dstar
 
 def tic():
@@ -94,7 +94,7 @@ def runtest(mapfile, start, goal, verbose = True):
   print(boundary)
   print("blocks")
   print(blocks)
-  MP = Astar.Weighted_Astar_Planner(blocks, boundary) # TODO: replace this with your own planner implementation
+  #MP = Astar.Weighted_Astar_Planner(blocks, boundary) # TODO: replace this with your own planner implementation
   DS = Dstar.Dstar_Planner(blocks, boundary)
   # # Display the environment
   # if verbose:
@@ -125,11 +125,11 @@ def runtest(mapfile, start, goal, verbose = True):
 
 def test_single_cube(verbose = False):
   print('Running single cube test...\n') 
-  start = np.array([2.3, 2.3, 1.3])
-  goal = np.array([7.0, 7.0, 5.5])
+  start = np.array([5.0, 3.0, 3.])
+  goal = np.array([5.0, 7.0, 3.])
   success, pathlength = runtest('./maps/single_cube.txt', start, goal, verbose)
   print('Success: %r'%success)
-  print('Path length: %d'%pathlength)
+  #print('Path length: %d'%pathlength)
   print('\n')
   
   
@@ -194,9 +194,9 @@ def test_monza(verbose = False):
 
 
 if __name__=="__main__":
-  #test_single_cube(True)
+  test_single_cube(True)
   #test_maze(True)
-  path = test_flappy_bird(True)
+  #path = test_flappy_bird(True)
   #test_monza(True)
   #test_window(True)
   #test_tower(True)
