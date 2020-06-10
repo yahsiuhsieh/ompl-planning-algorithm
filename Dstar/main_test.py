@@ -103,6 +103,7 @@ def runtest(mapfile, start, goal, verbose = True):
   # Call the motion planner
   t0 = tic()
   path = DS.planning(start, goal)
+  observedmap = DS.currMap
   toc(t0,"Planning")
   #print(path)
   
@@ -120,7 +121,7 @@ def runtest(mapfile, start, goal, verbose = True):
   goal_reached = sum((path[-1]-goal)**2) <= 0.1
   success = (not collision) and goal_reached
   pathlength = np.sum(np.sqrt(np.sum(np.diff(path,axis=0)**2,axis=1)))
-  return success, path
+  return success, path, observedmap
 
 
 def test_single_cube(verbose = False):
@@ -166,7 +167,7 @@ def test_tower(verbose = False):
 def test_flappy_bird(verbose = False):
   print('Running flappy bird test...\n') 
   start = np.array([0.5, 2.5, 5.5])
-  goal = np.array([5.0, 2.5, 3.5])
+  goal = np.array([16.0, 2.5, 5.5])
   path = runtest('./maps/flappy_bird.txt', start, goal, verbose) #success, pathlength = 
   # print('Success: %r'%success)
   # print('Path length: %d'%pathlength) 
@@ -196,8 +197,8 @@ def test_monza(verbose = False):
 if __name__=="__main__":
   #test_single_cube(True)
   #test_maze(True)
-  path = test_flappy_bird(True)
-  #test_monza(True)
+  #_,path,mymap = test_flappy_bird(True)
+  test_monza(True)
   #test_window(True)
   #test_tower(True)
   #test_room(True)

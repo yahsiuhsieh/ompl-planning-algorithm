@@ -10,7 +10,7 @@ from pqdict import pqdict
 
 class Dstar_Planner:
     
-    def __init__(self, obsize=5):       
+    def __init__(self, obsize=7):       
         
         # resolution of the grid map
         self.reso = 0.25
@@ -65,7 +65,7 @@ class Dstar_Planner:
         # grid index
         # s_x, s_y = self.length2grid(sx, self.minx),self.length2grid(sy, self.miny)
         # g_x, g_y = self.length2grid(gx, self.minx),self.length2grid(gy, self.miny)
-        s_x, s_y = 10,30
+        s_x, s_y = 5,30
         g_x, g_y = 15,30
         print("start point: {a},{b}".format(a=s_x,b=s_y))        
         print("goal point: {a},{b}".format(a=g_x,b=g_y)) 
@@ -98,7 +98,7 @@ class Dstar_Planner:
             currNode = pair[0]
             if self.consistent(currNode):
                 continue
-            print("\n====NEW iteration: dequeue node {s} with cost {c}".format(s=pair[0], c=self.nodeDict[pair[0]]))
+            #print("\n====NEW iteration: dequeue node {s} with cost {c}".format(s=pair[0], c=self.nodeDict[pair[0]]))
             
             # update the g value of the dequeued node
             self.update_G(pair)
@@ -139,18 +139,18 @@ class Dstar_Planner:
         # update the node / pair[0]: coordinate(tuple)
         g, rhs = self.nodeDict[pair[0]][0], self.nodeDict[pair[0]][1]
         if(g > rhs): # overconsistent
-            print("====Current node overconsistent!")
+            #print("====Current node overconsistent!")
             self.nodeDict[pair[0]][0] = rhs
-            print("now node {n} value:[{g},{rhs}]".format(n=pair[0],g=self.nodeDict[pair[0]][0],rhs=self.nodeDict[pair[0]][1]))
+            #print("now node {n} value:[{g},{rhs}]".format(n=pair[0],g=self.nodeDict[pair[0]][0],rhs=self.nodeDict[pair[0]][1]))
             return "overconsistent"
             
         elif(g < rhs): # underconsistent.
-            print("====Current node underconsistent!")    
+            #print("====Current node underconsistent!")    
             self.nodeDict[pair[0]][0] = np.inf
-            print("now node {n} value:[{g},{rhs}]".format(n=pair[0],g=self.nodeDict[pair[0]][0],rhs=self.nodeDict[pair[0]][1]))
+            #print("now node {n} value:[{g},{rhs}]".format(n=pair[0],g=self.nodeDict[pair[0]][0],rhs=self.nodeDict[pair[0]][1]))
             return "underconsistent"
         else:
-            print("====Current node consistent!")
+            #print("====Current node consistent!")
             return "consistent"
         
             
@@ -159,7 +159,7 @@ class Dstar_Planner:
         update the RHS value of node's neighbor
         '''
         node = pair[0]
-        print("====Update the neighbor of node {idx}".format(idx=node))
+        #print("====Update the neighbor of node {idx}".format(idx=node))
                
         # looking for valid node j
         for motion in self.expand():
@@ -194,18 +194,18 @@ class Dstar_Planner:
             if(tmp_idx == self.n_goal): # goal's rhs remains 0
                 self.nodeDict[tmp_idx] = [np.inf, 0]
             else:
-                print("find new node: {n}, value <{g},{rhs}>".format(n=tmp_idx, g=np.inf, rhs=tmp_rhs))
+                #print("find new node: {n}, value <{g},{rhs}>".format(n=tmp_idx, g=np.inf, rhs=tmp_rhs))
                 self.nodeDict[tmp_idx] = [np.inf, tmp_rhs]
         
         #print("After Update: rhs: ",tmp_rhs)
         # if g value and rhs value not equal (inconsistent), queue it
         if not self.consistent(tmp_idx):
-            print(self.nodeDict[tmp_idx][0],self.nodeDict[tmp_idx][1])
+            #print(self.nodeDict[tmp_idx][0],self.nodeDict[tmp_idx][1])
             if tmp_idx in self.queue:
-                print("update node {s} in queue with key {k}".format(s=tmp_idx,k=self.key(tmp_idx)))
+                #print("update node {s} in queue with key {k}".format(s=tmp_idx,k=self.key(tmp_idx)))
                 self.queue[tmp_idx] = self.key(tmp_idx)
             else:
-                print("add node {s} to queue".format(s=tmp_idx))
+                #print("add node {s} to queue".format(s=tmp_idx))
                 self.queue.additem(tmp_idx, self.key(tmp_idx))
    
     
@@ -268,8 +268,24 @@ class Dstar_Planner:
         # obstacle map generation
         self.obmap = np.array([[False for i in range(self.ywidth)]for j in range(self.xwidth)])
         
+        self.obmap[9,28]=True
+        self.obmap[9,29]=True
+        self.obmap[9,30]=True
+        self.obmap[9,31]=True
+        self.obmap[9,32]=True
+        self.obmap[9,33]=True
+        self.obmap[9,34]=True
+        self.obmap[9,35]=True
+        self.obmap[9,36]=True
+        
+        self.obmap[13,32]=True
+        self.obmap[13,31]=True
         self.obmap[13,30]=True
-
+        self.obmap[13,29]=True
+        self.obmap[13,28]=True
+        self.obmap[13,27]=True
+        self.obmap[13,26]=True
+        self.obmap[13,25]=True
     
     def updateObstacleMap(self, node):
         x,y = node[0], node[1]
@@ -427,12 +443,11 @@ class Dstar_Planner:
                 
                 if self.isObstacle(tmp_idx):
                     c_ij = np.inf
-                print("node {n} cost {c1} + c_ij {c}".format(n=tmp_idx,c1=tmp_node[0],c=c_ij))
-                print(tmp_node[0]+c_ij)
+                #print("node {n} cost {c1} + c_ij {c}".format(n=tmp_idx,c1=tmp_node[0],c=c_ij))
+                #print(tmp_node[0]+c_ij)
                 if(tmp_node[0]+c_ij< min_cost):
                     min_cost = tmp_node[0]+c_ij
                     min_idx = tmp_idx
-                print(min_idx)
             
         print("next min node: {s}, cost: {c}".format(s=min_idx, c=min_cost))
         return min_idx 
