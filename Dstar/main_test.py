@@ -16,7 +16,9 @@ import Dstar_Planner as Dstar
 def tic():
   return time.time()
 def toc(tstart, nm=""):
-  print('%s took: %s sec.\n' % (nm,(time.time() - tstart)))
+    dt = time.time() - tstart
+    print('%s took: %s sec.\n' % (nm,(dt)))
+    return dt
   
 
 def load_map(fname):
@@ -79,7 +81,7 @@ def draw_block_list(ax,blocks):
     return h
 
 
-def runtest(mapfile, start, goal, verbose = True):
+def runtest(mapfile, start, goal, path2, path3, path4, verbose = True):
   '''
   This function:
    * load the provided mapfile
@@ -104,13 +106,19 @@ def runtest(mapfile, start, goal, verbose = True):
   t0 = tic()
   path = DS.planning(start, goal)
   observedmap = DS.currMap
-  toc(t0,"Planning")
+  total_t = toc(t0,"Planning")
+  newfile = open('time.txt','a')
+  newfile.write(str(total_t))
+  newfile.close()
   #print(path)
   
   # Plot the path
   if verbose:
     fig, ax, hb, hs, hg = draw_map(boundary, blocks, start, goal)
     ax.plot(path[:,0],path[:,1],path[:,2],'r-')
+    ax.plot(path2[:,0],path2[:,1],path2[:,2],'b-')
+    ax.plot(path3[:,0],path3[:,1],path3[:,2],'g-')
+    ax.plot(path4[:,0],path4[:,1],path4[:,2],'y-')
     plt.ioff()
     plt.show()
 
@@ -118,10 +126,11 @@ def runtest(mapfile, start, goal, verbose = True):
   # TODO: You can implement your own algorithm or use an existing library for segment and 
   #       axis-aligned bounding box (AABB) intersection 
   collision = False
-  goal_reached = sum((path[-1]-goal)**2) <= 0.1
-  success = (not collision) and goal_reached
-  pathlength = np.sum(np.sqrt(np.sum(np.diff(path,axis=0)**2,axis=1)))
-  return success, path, observedmap
+  #goal_reached = sum((path[-1]-goal)**2) <= 0.1
+  #success = (not collision) and goal_reached
+  success = True
+  #pathlength = np.sum(np.sqrt(np.sum(np.diff(path,axis=0)**2,axis=1)))
+  return success, path
 
 
 def test_single_cube(verbose = False):
@@ -144,11 +153,11 @@ def test_maze(verbose = False):
   print('\n')
 
     
-def test_window(verbose = False):
+def test_window(path2,path3,path4,verbose = False):
   print('Running window test...\n') 
   start = np.array([0.2, -4.9, 0.2])
   goal = np.array([6.0, 18.0, 3.0])
-  success, pathlength = runtest('./maps/window.txt', start, goal, verbose)
+  success, pathlength = runtest('./maps/window.txt', start, goal, path2,path3,path4,verbose)
   print('Success: %r'%success)
   print('Path length: %d'%pathlength)
   print('\n')
@@ -164,15 +173,14 @@ def test_tower(verbose = False):
   print('\n')
 
      
-def test_flappy_bird(verbose = False):
+def test_flappy_bird(path2, path3, path4, verbose = False):
   print('Running flappy bird test...\n') 
   start = np.array([0.5, 2.5, 5.5])
-  goal = np.array([16.0, 2.5, 5.5])
-  path = runtest('./maps/flappy_bird.txt', start, goal, verbose) #success, pathlength = 
+  goal = np.array([19.0, 2.5, 5.5])
+  path = runtest('./maps/flappy_bird.txt', start, goal, path2, path3, path4, verbose) #success, pathlength = 
   # print('Success: %r'%success)
   # print('Path length: %d'%pathlength) 
   # print('\n')
-  return path
   
 def test_room(verbose = False):
   print('Running room test...\n') 
@@ -193,16 +201,51 @@ def test_monza(verbose = False):
   print('Path length: %d'%pathlength)
   print('\n')
 
+def read2path(file):
+    path = []
+    f = open(file,'r')
+    line = f.readline()
+    
+    while line:
+        
+        line = line.strip('[')
+        line = line.rstrip()
+        line = line[:-1]
+        #print(line)
+        info = line.split(' ')
+        coor = []
+        for i in info:
+            coor.append(i)
+        path.append(coor)
+        line = f.readline()
+    
+    f.close()
+    return np.array(path)
+        
 
 if __name__=="__main__":
+  
+  f2 = './data/rrt_window.txt'
+  f3 = './data/rrtstar_window.txt'
+  f4 = './data/rrtconnect_window.txt'
+  f5 = './data/rrt_flappy.txt'
+  f6 = './data/rrtstar_flappy.txt'
+  f7 = './data/rrtconnect_flappy.txt'
+  path2 = read2path(f5)
+  path3 = read2path(f6)
+  path4 = read2path(f7)
+  
+  
   #test_single_cube(True)
   #test_maze(True)
-  #_,path,mymap = test_flappy_bird(True)
-  test_monza(True)
-  #test_window(True)
+  test_flappy_bird(path2, path3, path4, True)
+  #test_monza(path2,path3,path4,True)
+  #test_window(path2,path3,path4,True)
   #test_tower(True)
   #test_room(True)
 
+  
+  
 
 
 

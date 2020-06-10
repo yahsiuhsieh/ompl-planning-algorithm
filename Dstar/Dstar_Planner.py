@@ -10,7 +10,7 @@ from pqdict import pqdict
 
 class Dstar_Planner:
     
-    def __init__(self, blocks, boundary, obsize=19, reso=0.1):       
+    def __init__(self, blocks, boundary, obsize=21, reso=0.1):       
         
         # resolution of the grid map
         self.reso = reso
@@ -288,12 +288,12 @@ class Dstar_Planner:
             oy_min, oy_max = self.length2grid(obs[1],self.miny),self.length2grid(obs[4],self.miny)
             oz_min, oz_max = self.length2grid(obs[2],self.minz),self.length2grid(obs[5], self.minz)
             print("obstacle size: x: {x1}/{x2}, y: {y1}/{y2}, z:{z1}/{z2}".format(x1=ox_min,x2=ox_max,y1=oy_min,y2=oy_max,z1=oz_min,z2=oz_max))
-            # if ox_max >= self.xwidth:
-            #     ox_max = self.xwidth-1
-            # if oy_max >= self.ywidth:
-            #     oy_max = self.ywidth-1
-            # if oz_max >= self.zwidth:
-            #    oz_max = self.zwidth-1
+            if ox_max > self.xwidth:
+                ox_max = self.xwidth-1
+            if oy_max > self.ywidth:
+                oy_max = self.ywidth-1
+            if oz_max > self.zwidth:
+                oz_max = self.zwidth-1
             # iterate through each coordinate           
             for bx in range(ox_min, ox_max):
                 for by in range(oy_min, oy_max):
