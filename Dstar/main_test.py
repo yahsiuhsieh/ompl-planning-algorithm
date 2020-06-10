@@ -166,7 +166,7 @@ def test_tower(verbose = False):
 def test_flappy_bird(verbose = False):
   print('Running flappy bird test...\n') 
   start = np.array([0.5, 2.5, 5.5])
-  goal = np.array([19.0, 2.5, 5.5])
+  goal = np.array([5.0, 2.5, 3.5])
   path = runtest('./maps/flappy_bird.txt', start, goal, verbose) #success, pathlength = 
   # print('Success: %r'%success)
   # print('Path length: %d'%pathlength) 
@@ -194,9 +194,9 @@ def test_monza(verbose = False):
 
 
 if __name__=="__main__":
-  test_single_cube(True)
+  #test_single_cube(True)
   #test_maze(True)
-  #path = test_flappy_bird(True)
+  path = test_flappy_bird(True)
   #test_monza(True)
   #test_window(True)
   #test_tower(True)
