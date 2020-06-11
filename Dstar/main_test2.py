@@ -118,9 +118,6 @@ def runtest(mapfile, start, goal, path2, path3, path4, verbose, FLAG):
   if FLAG == 3:
       file_t = './time/flappy.txt'
       file_l = './length/flappy.txt'
-  if FLAG == 4:
-      file_t = './time/cube.txt'
-      file_l = './length/cube.txt'
   newfile = open(file_t,'a')
   newfile.write(str(total_t)+'\n')
   newfile.close()
@@ -133,9 +130,9 @@ def runtest(mapfile, start, goal, path2, path3, path4, verbose, FLAG):
   if verbose:
     fig, ax, hb, hs, hg = draw_map(boundary, blocks, start, goal)
     ax.plot(path[:,0],path[:,1],path[:,2],'r-')
-    #ax.plot(path2[:,0],path2[:,1],path2[:,2],'b-')
-    #ax.plot(path3[:,0],path3[:,1],path3[:,2],'g-')
-    #ax.plot(path4[:,0],path4[:,1],path4[:,2],'y-')
+    ax.plot(path2[:,0],path2[:,1],path2[:,2],'b-')
+    ax.plot(path3[:,0],path3[:,1],path3[:,2],'g-')
+    ax.plot(path4[:,0],path4[:,1],path4[:,2],'y-')
     plt.ioff()
     plt.show()
 
@@ -150,11 +147,11 @@ def runtest(mapfile, start, goal, path2, path3, path4, verbose, FLAG):
   return success, path
 
 
-def test_single_cube(path2, path3, path4,verbose = False):
+def test_single_cube(verbose = False):
   print('Running single cube test...\n') 
   start = np.array([5.0, 3.0, 3.])
   goal = np.array([5.0, 7.0, 3.])
-  success, pathlength = runtest('./maps/single_cube.txt', start, goal,path2, path3, path4, verbose, FLAG=4)
+  success, pathlength = runtest('./maps/single_cube.txt', start, goal, verbose)
   print('Success: %r'%success)
   #print('Path length: %d'%pathlength)
   print('\n')
@@ -243,35 +240,36 @@ def read2path(file):
         
 
 if __name__=="__main__":
+    
+  f8 = './data/rrt_room.txt'
+  f9 = './data/rrtstar_room.txt'
+  f10 = './data/rrtconnect_room.txt'
+  path2 = read2path(f8)
+  path3 = read2path(f9)
+  path4 = read2path(f10)
+  
+  # for i in range(20):
+  #     test_room(path2, path3, path4, True)
+  
   f2 = './data/rrt_window.txt'
   f3 = './data/rrtstar_window.txt'
   f4 = './data/rrtconnect_window.txt'
   f5 = './data/rrt_flappy.txt'
   f6 = './data/rrtstar_flappy.txt'
   f7 = './data/rrtconnect_flappy.txt'
-  f8 = './data/rrt_room.txt'
-  f9 = './data/rrtstar_room.txt'
-  f10 = './data/rrtconnect_room.txt'
-
-  path2 = read2path(f8)
-  path3 = read2path(f9)
-  path4 = read2path(f10)
+  path2 = read2path(f5)
+  path3 = read2path(f6)
+  path4 = read2path(f7)
   
   
-      
-  
-
-  
-  #test_room(path2, path3, path4, True)
-  for i in range(15):
-      test_flappy_bird(path2, path3, path4, True)
-  #test_single_cube(path2, path3, path4, True)
-  #test_maze(path2, path3, path4,True)
-  #test_flappy_bird(path2, path3, path4, True)
+  #test_single_cube(True)
+  #test_maze(True)
+  test_flappy_bird(path2, path3, path4, True)
   #test_monza(path2,path3,path4,True)
+  # for i in range(20):
   #     test_window(path2,path3,path4,True)
   #test_tower(True)
-  #for i in range(20):
+  
 
 
   

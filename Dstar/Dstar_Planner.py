@@ -10,7 +10,7 @@ from pqdict import pqdict
 
 class Dstar_Planner:
     
-    def __init__(self, blocks, boundary, obsize=21, reso=0.1):       
+    def __init__(self, blocks, boundary, obsize=15, reso=0.1):       
         
         # resolution of the grid map
         self.reso = reso
