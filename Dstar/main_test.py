@@ -7,6 +7,7 @@ Created on Fri May  8 15:44:08 2020
 
 import numpy as np
 import time
+import matplotlib as mpl
 import matplotlib.pyplot as plt; plt.ion()
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -51,7 +52,6 @@ def draw_map(boundary, blocks, start, goal):
   ax.set_xlabel('X')
   ax.set_ylabel('Y')
   ax.set_zlabel('Z')
-  plt.title('Paths from different algorithms')
   ax.set_xlim(boundary[0,0],boundary[0,3])
   ax.set_ylim(boundary[0,1],boundary[0,4])
   ax.set_zlim(boundary[0,2],boundary[0,5])  
@@ -109,34 +109,38 @@ def runtest(mapfile, start, goal, path2, path3, path4, verbose, FLAG):
   observedmap = DS.currMap
   total_t = toc(t0,"Planning")
   pathlength = np.sum(np.sqrt(np.sum(np.diff(path,axis=0)**2,axis=1)))
-  if FLAG == 1:
-      file_t = './time/window.txt'
-      file_l = './length/window.txt'
-  if FLAG == 2:
-      file_t = './time/room.txt'
-      file_l = './length/room.txt'
-  if FLAG == 3:
-      file_t = './time/flappy.txt'
-      file_l = './length/flappy.txt'
-  if FLAG == 4:
-      file_t = './time/cube.txt'
-      file_l = './length/cube.txt'
-  newfile = open(file_t,'a')
-  newfile.write(str(total_t)+'\n')
-  newfile.close()
-  newfile = open(file_l,'a')
-  newfile.write(str(pathlength)+'\n')
-  newfile.close()
+  # if FLAG == 1:
+  #     file_t = './time/window.txt'
+  #     file_l = './length/window.txt'
+  # if FLAG == 2:
+  #     file_t = './time/room.txt'
+  #     file_l = './length/room.txt'
+  # if FLAG == 3:
+  #     file_t = './time/flappy.txt'
+  #     file_l = './length/flappy.txt'
+  # if FLAG == 4:
+  #     file_t = './time/cube.txt'
+  #     file_l = './length/cube.txt'
+  # newfile = open(file_t,'a')
+  # newfile.write(str(total_t)+'\n')
+  # newfile.close()
+  # newfile = open(file_l,'a')
+  # newfile.write(str(pathlength)+'\n')
+  # newfile.close()
   #print(path)
   
   # Plot the path
   if verbose:
     fig, ax, hb, hs, hg = draw_map(boundary, blocks, start, goal)
-    ax.plot(path[:,0],path[:,1],path[:,2],'r-')
-    #ax.plot(path2[:,0],path2[:,1],path2[:,2],'b-')
-    #ax.plot(path3[:,0],path3[:,1],path3[:,2],'g-')
-    #ax.plot(path4[:,0],path4[:,1],path4[:,2],'y-')
+    mpl.rcParams['legend.fontsize'] = 7
+    mpl.rcParams["legend.loc"] = 'lower left'
+    ax.plot(path[:,0],path[:,1],path[:,2],'r-',label="D* Lite")
+    ax.plot(path2[:,0],path2[:,1],path2[:,2],'b-',label="RRT")
+    ax.plot(path3[:,0],path3[:,1],path3[:,2],'g-',label="RRT*")
+    ax.plot(path4[:,0],path4[:,1],path4[:,2],'y-',label="RRT Connect")
+    ax.legend()
     plt.ioff()
+    plt.savefig("./result/"+str(FLAG)+".png")
     plt.show()
 
   # TODO: You should verify whether the path actually intersects any of the obstacles in continuous space
@@ -154,7 +158,7 @@ def test_single_cube(path2, path3, path4,verbose = False):
   print('Running single cube test...\n') 
   start = np.array([5.0, 3.0, 3.])
   goal = np.array([5.0, 7.0, 3.])
-  success, pathlength = runtest('./maps/single_cube.txt', start, goal,path2, path3, path4, verbose, FLAG=4)
+  success, pathlength = runtest('./maps/single_cube.txt', start, goal,path2, path3, path4, verbose,FLAG='cube')
   print('Success: %r'%success)
   #print('Path length: %d'%pathlength)
   print('\n')
@@ -174,7 +178,7 @@ def test_window(path2,path3,path4,verbose = False):
   print('Running window test...\n') 
   start = np.array([0.2, -4.9, 0.2])
   goal = np.array([6.0, 18.0, 3.0])
-  success, pathlength = runtest('./maps/window.txt', start, goal, path2,path3,path4, verbose,FLAG=1)
+  success, pathlength = runtest('./maps/window.txt', start, goal, path2,path3,path4, verbose,FLAG='window')
   print('Success: %r'%success)
   #print('Path length: %d'%pathlength)
   print('\n')
@@ -194,7 +198,7 @@ def test_flappy_bird(path2, path3, path4, verbose = False):
   print('Running flappy bird test...\n') 
   start = np.array([0.5, 2.5, 5.5])
   goal = np.array([16.0, 2.5, 5.5])
-  path = runtest('./maps/flappy_bird.txt', start, goal, path2, path3, path4, verbose, FLAG=3) #success, pathlength = 
+  path = runtest('./maps/flappy_bird.txt', start, goal, path2, path3, path4, verbose,FLAG='flappy') #success, pathlength = 
   # print('Success: %r'%success)
   # print('Path length: %d'%pathlength) 
   # print('\n')
@@ -203,7 +207,7 @@ def test_room(path2, path3, path4, verbose = False):
   print('Running room test...\n') 
   start = np.array([1.0, 5.0, 1.5])
   goal = np.array([9.0, 7.0, 1.5])
-  success, path = runtest('./maps/room.txt', start, goal, path2, path3, path4, verbose, FLAG=2)
+  success, path = runtest('./maps/room.txt', start, goal, path2, path3, path4, verbose,FLAG='room')
   print('Success: %r'%success)
   #print('Path length: %d'%pathlength)
   print('\n')
@@ -243,35 +247,60 @@ def read2path(file):
         
 
 if __name__=="__main__":
-  f2 = './data/rrt_window.txt'
-  f3 = './data/rrtstar_window.txt'
-  f4 = './data/rrtconnect_window.txt'
-  f5 = './data/rrt_flappy.txt'
-  f6 = './data/rrtstar_flappy.txt'
-  f7 = './data/rrtconnect_flappy.txt'
-  f8 = './data/rrt_room.txt'
-  f9 = './data/rrtstar_room.txt'
-  f10 = './data/rrtconnect_room.txt'
-
-  path2 = read2path(f8)
-  path3 = read2path(f9)
-  path4 = read2path(f10)
   
-  
+    option = input("choose map")
+    
+    if option == "cube":
+    
+        f11 = './data/rrt_cube.txt'
+        f12 = './data/rrtstar_cube.txt'
+        f13 = './data/rrtconnect_cube.txt'
+        path2 = read2path(f11)
+        path3 = read2path(f12)
+        path4 = read2path(f13)
+        test_single_cube(path2, path3, path4, True)
+        
+    elif option == "window":
       
+        f2 = './data/rrt_window.txt'
+        f3 = './data/rrtstar_window.txt'
+        f4 = './data/rrtconnect_window.txt'
+        path2 = read2path(f2)
+        path3 = read2path(f3)
+        path4 = read2path(f4)
+        test_window(path2,path3,path4,True)
+        
+    elif option == "flappy":
+    
+        f5 = './data/rrt_flappy.txt'
+        f6 = './data/rrtstar_flappy.txt'
+        f7 = './data/rrtconnect_flappy.txt'
+        path2 = read2path(f5)
+        path3 = read2path(f6)
+        path4 = read2path(f7)
+        test_flappy_bird(path2, path3, path4, True)
+        
+    elif option == "room":
+    
+        f8 = './data/rrt_room.txt'
+        f9 = './data/rrtstar_room.txt'
+        f10 = './data/rrtconnect_room.txt'
+        path2 = read2path(f8)
+        path3 = read2path(f9)
+        path4 = read2path(f10)
+        test_room(path2, path3, path4, True)
   
 
   
-  #test_room(path2, path3, path4, True)
-  for i in range(15):
-      test_flappy_bird(path2, path3, path4, True)
-  #test_single_cube(path2, path3, path4, True)
-  #test_maze(path2, path3, path4,True)
+     
+  
+  
+  
   #test_flappy_bird(path2, path3, path4, True)
+  #test_maze(path2, path3, path4,True)
   #test_monza(path2,path3,path4,True)
-  #     test_window(path2,path3,path4,True)
   #test_tower(True)
-  #for i in range(20):
+
 
 
   
