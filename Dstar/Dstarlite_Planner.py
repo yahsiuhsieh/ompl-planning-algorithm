@@ -8,7 +8,7 @@ import math
 import numpy as np
 from pqdict import pqdict
 
-class Dstar_Planner:
+class Dstarlite_Planner:
     
     def __init__(self, blocks, boundary, obsize=15, reso=0.1):       
         

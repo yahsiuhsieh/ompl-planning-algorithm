@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt; plt.ion()
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 #import Weighted_Astar_Planner as Astar
-import Dstar_Planner as Dstar
+import Dstarlite_Planner as Dstarlite
 
 def tic():
   return time.time()
@@ -98,7 +98,7 @@ def runtest(mapfile, start, goal, path2, path3, path4, verbose, FLAG):
   print("blocks")
   print(blocks)
   #MP = Astar.Weighted_Astar_Planner(blocks, boundary) # TODO: replace this with your own planner implementation
-  DS = Dstar.Dstar_Planner(blocks, boundary)
+  DS = Dstarlite.Dstarlite_Planner(blocks, boundary)
   # # Display the environment
   # if verbose:
     
