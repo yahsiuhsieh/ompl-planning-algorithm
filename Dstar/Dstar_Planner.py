@@ -26,22 +26,7 @@ class Dstar_Planner:
         self.get_obstacle_map(blocks,boundary)
         # get the map from robot perspective
         self.currMap = np.array([[[False for i in range(self.zwidth)]for j in range(self.ywidth)]for k in range(self.xwidth)])
-        
-        
-    class Node:
-        
-        def __init__(self, x, y, z, g=np.inf, rhs=np.inf):
-            # grid position of node
-            self.x = x
-            self.y = y
-            self.z = z
-            self.g = g # cost
-            self.rhs = rhs # updated g value 
-            
-        def printNode(self):
-            print(str(self.x) + "," + str(self.y) + "," + str(self.z))
-        
-        
+          
     def planning(self,start,goal):
         '''
         ==== D* algorithm ====
@@ -58,7 +43,6 @@ class Dstar_Planner:
         2. node set: [type] dict, [form] {node: [g, rhs]}
         3. queue: [type] pqdict, [form] {node: <key>}
         '''
-        
         # actual length
         sx, sy, sz = start[0], start[1], start[2]
         gx, gy, gz = goal[0], goal[1], goal[2]
@@ -132,11 +116,6 @@ class Dstar_Planner:
             self.update_Neighbor(pair)
             #print(self.n_last in self.queue)
             
-
-                
-                
-                
-            
 #%% Functions      
         
     def update_G(self, pair):
@@ -172,8 +151,6 @@ class Dstar_Planner:
             if(self.validNode(tmp_idx)):
                 self.update_RHS(tmp_idx)
                 
-                        
-    #print("node {n}, cost: {g}".format(n=tmp_idx, g=self.nodeDict[tmp_idx]))
    
     def update_RHS(self, tmp_idx, OBSTACLE=False):
         
@@ -189,9 +166,7 @@ class Dstar_Planner:
             if(tmp_idx == self.n_goal): # goal's rhs remains 0
                 self.nodeDict[tmp_idx][1] = 0
             else:
-                #print("Before update: rhs: ",self.nodeDict[tmp_idx][1])
                 self.nodeDict[tmp_idx][1] = tmp_rhs
-        
         # create a new node pair
         else:
             if(tmp_idx == self.n_goal): # goal's rhs remains 0
@@ -199,7 +174,6 @@ class Dstar_Planner:
             else:
                 #print("find new node: {n}, value <{g},{rhs}>".format(n=tmp_idx, g=np.inf, rhs=tmp_rhs))
                 self.nodeDict[tmp_idx] = [np.inf, tmp_rhs]
-        #print("After Update: rhs: ",tmp_rhs)
         # if g value and rhs value not equal (inconsistent), queue it
         if not self.consistent(tmp_idx):
             if tmp_idx in self.queue:
@@ -243,12 +217,6 @@ class Dstar_Planner:
             return False
         elif z < 0 or z >= self.zwidth:
             return False
-        # elif node.x < 0 or node.x>= self.xwidth:
-        #     return False
-        # elif node.y < 0 or node.y>= self.ywidth:
-        #     return False
-        # elif node.z < 0 or node.z>= self.zwidth:
-        #     return False
         
         return True
         
@@ -367,8 +335,6 @@ class Dstar_Planner:
         print("Done, path length",len(self.current_path))
         return self.current_path
     
- 
-        
     def moveAgent(self):
         
         blocked = False
@@ -405,7 +371,6 @@ class Dstar_Planner:
                 self.final_path.append(pos)
                 
                 # update the map through this new position
-                #print("update the map with new observation")
                 self.updateObstacleMap(agentPos)
                 
             # the next node is actually an obstacle
@@ -443,9 +408,7 @@ class Dstar_Planner:
                 tmp_node = self.nodeDict[tmp_idx]
                 # if the node is obstacle, set the edge cost to infinity
                 if self.isObstacle(tmp_idx):
-                    c_ij = np.inf
-                #print("node {n} cost {c1} + c_ij {c}".format(n=tmp_idx,c1=tmp_node[0],c=c_ij))
-                #print(tmp_node[1]+c_ij)              
+                    c_ij = np.inf              
                 if(tmp_node[0]+c_ij < min_cost):
                     min_cost = tmp_node[0]+c_ij
                     min_idx = tmp_idx
@@ -458,7 +421,6 @@ class Dstar_Planner:
         cur_node = self.nodeDict[node]
         min_cost = np.inf
         min_idx = ()
-        #print("cur node g value",cur_node[0])
         
         # iterate through the successor of the node
         for motion in self.expand6():
@@ -471,13 +433,10 @@ class Dstar_Planner:
                 
                 if self.isObstacle(tmp_idx):
                     c_ij = np.inf
-                #print("node {n} cost {c1} + c_ij {c}".format(n=tmp_idx,c1=tmp_node[0],c=c_ij))
-                #print(tmp_node[1]+c_ij)
                 if(tmp_node[1]+c_ij< min_cost):
                     min_cost = tmp_node[1]+c_ij
                     min_idx = tmp_idx
             
-        #print("next min node: {s}".format(s=min_idx))
         return min_idx 
     
     def length2grid(self, pos, min_p):
@@ -508,14 +467,6 @@ class Dstar_Planner:
                   [0,0,1,1], [0,0,-1,1]]
 
         return motion
-    
-    @staticmethod
-    def cost_model():
-        model = [[[math.sqrt(3),math.sqrt(2),math.sqrt(3)],[math.sqrt(2),math.sqrt(1),math.sqrt(2)],[math.sqrt(3),math.sqrt(2),math.sqrt(3)]],
-                  [[math.sqrt(2),math.sqrt(1),math.sqrt(2)],[math.sqrt(1),math.sqrt(0),math.sqrt(1)],[math.sqrt(2),math.sqrt(1),math.sqrt(2)]],
-                  [[math.sqrt(3),math.sqrt(2),math.sqrt(3)],[math.sqrt(2),math.sqrt(1),math.sqrt(2)],[math.sqrt(3),math.sqrt(2),math.sqrt(3)]]]
-
-        return np.array(model)
         
 if __name__ == '__main__':
     
