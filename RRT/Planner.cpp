@@ -38,7 +38,7 @@ bool Planner::isStateValid(const ob::State *state) {
     return true;
 }
 
-void Planner::plan() {
+bool Planner::plan() {
     // construct a state space we are planning in
     auto space(std::make_shared<ob::RealVectorStateSpace>(3));
 
@@ -78,9 +78,11 @@ void Planner::plan() {
     auto pdef(std::make_shared<ob::ProblemDefinition>(si));
     pdef->setStartAndGoalStates(start, goal);
 
-    // define a RRT planner
-    auto planner(std::make_shared<og::RRT>(si));
+    // define a planner
+    auto planner(std::make_shared<og::RRTConnect>(si));
     planner->setProblemDefinition(pdef);  // set the problem we are trying to solve for the planner
+    // planner->setRange(0.1);
+    // planner->setGoalBias(0.2);
     planner->setup();
 
     // this call is optional, but we put it in to get more output information
@@ -91,8 +93,12 @@ void Planner::plan() {
 
     if (solved) {
         std::cout << "Found solution:" << std::endl;
+        float path_length = pdef->getSolutionPath()->length();
         pdef->getSolutionPath()->print(std::cout);
+        std::cout << "Path length: " << path_length << std::endl;
+        return true;
     } else {
         std::cout << "No solution found" << std::endl;
+        return false;
     }
 }
